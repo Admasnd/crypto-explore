@@ -9,11 +9,9 @@ theorem gcd_divisors : ∀ a b d : ℤ,  d ∣ a
   fun (a b d : ℤ) => 
   fun (h₁ : d ∣ a) (h₂ : d ∣ b) => 
   -- factor a in terms of d using definition of divides
-  have : (d ∣  a) = ∃ p : ℤ, a = d * p := Int.dvd_def d a
-  have h₃ : ∃ p : ℤ, a = d * p := by rwa [this] at h₁
+  have h₃ : ∃ p : ℤ, a = d * p := Int.dvd_def d a ▸ h₁    
   -- factor b in terms of d using definition of divides
-  have : (d ∣  b) = ∃ q : ℤ, b = d * q := Int.dvd_def d b
-  have h₄ : ∃ q : ℤ, b = d * q := by rwa [this] at h₂
+  have h₄ : ∃ q : ℤ, b = d * q := Int.dvd_def d b ▸ h₂ 
   /- Use extended euclidean algorithm to compute compute
      the linear coefficients of a and b that such that 
      their combination equals their gcd
@@ -26,9 +24,7 @@ theorem gcd_divisors : ∀ a b d : ℤ,  d ∣ a
     | ⟨ (p : ℤ), (hp : a = d * p) ⟩, ⟨(q : ℤ), (hq : b = d * q)⟩ => 
     -- rewrite above linear equation to relate d to gcd(a,b) 
     have : (Int.gcd a b) = (d * p) * a.gcdA b + (d * q) * a.gcdB b :=
-      by rw (occs := .pos [2]) [hp] at h₅;
-         rw (occs := .pos [3]) [hq] at h₅;
-         assumption
+    hq ▸ (hp ▸ h₅ ) 
     -- rewrite linear equation to make clear that d | gcd(a,b)
     /- grind used to do equational reasoning that takes 
        into account associativity and commutativity necessary
@@ -43,4 +39,4 @@ theorem gcd_divisors : ∀ a b d : ℤ,  d ∣ a
        of a and b divides their gcd based on the definition of divides
     -/
     show d ∣ (Int.gcd a b) 
-    by rwa [<-(Int.dvd_def d (Int.gcd a b))] at this
+    from Int.dvd_def d (Int.gcd a b) ▸ this
