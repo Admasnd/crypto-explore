@@ -40,3 +40,20 @@ theorem gcd_divisors : ∀ a b d : ℤ,  d ∣ a
       ⟨ p * a.gcdA b + q * a.gcdB b, h₃ ⟩ 
     show d ∣ (Int.gcd a b) 
     from Int.dvd_def d (Int.gcd a b) ▸ this
+
+def egcd (a b : ℤ) : ℤ × ℤ × ℤ := 
+  helper (Int.natAbs a) (Int.natAbs b)
+where
+  helper (a : ℕ) (b : ℕ) : ℤ × ℤ × ℤ :=
+   if h₁ : a = 0 then 
+    (b, 0, 1) 
+   else
+     let q := b / a
+     let r := b % a
+     have h₂ : 0 < a := zero_lt_iff.mpr h₁ 
+     -- hypothesis needed to automatically prove termination
+     have : r < a := Nat.mod_lt b h₂
+     let (c, x', y') := helper r a
+     let x := y' - q * x'
+     let y := x'
+     (c, x, y)
