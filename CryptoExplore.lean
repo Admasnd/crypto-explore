@@ -50,10 +50,12 @@ where
    else
      let q := b / a
      let r := b % a
-     have h₂ : 0 < a := zero_lt_iff.mpr h₁ 
-     -- hypothesis needed to automatically prove termination
-     have : r < a := Nat.mod_lt b h₂
      let (c, x', y') := helper r a
      let x := y' - q * x'
      let y := x'
      (c, x, y)
+termination_by a
+decreasing_by
+    have h₂ : 0 < a := zero_lt_iff.mpr h₁ 
+    have : r < a := Nat.mod_lt b h₂
+    assumption
