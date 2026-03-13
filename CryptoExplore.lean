@@ -41,21 +41,43 @@ theorem gcd_divisors : ∀ a b d : ℤ,  d ∣ a
     show d ∣ (Int.gcd a b) 
     from Int.dvd_def d (Int.gcd a b) ▸ this
 
-def egcd (a b : ℤ) : ℤ × ℤ × ℤ := 
-  helper (Int.natAbs a) (Int.natAbs b)
-where
-  helper (a : ℕ) (b : ℕ) : ℤ × ℤ × ℤ :=
+def egcd_helper (a : ℕ) (b : ℕ) : ℕ × ℤ × ℤ :=
    if h₁ : a = 0 then 
     (b, 0, 1) 
    else
-     let q := b / a
-     let r := b % a
-     let (c, x', y') := helper r a
-     let x := y' - q * x'
-     let y := x'
-     (c, x, y)
+     let (c, x', y') := egcd_helper (b % a) a
+     (c, (y' - (b / a) * x'), x')
 termination_by a
 decreasing_by
     have h₂ : 0 < a := zero_lt_iff.mpr h₁ 
-    have : r < a := Nat.mod_lt b h₂
+    have : (b % a) < a := Nat.mod_lt b h₂
     assumption
+
+def egcd (a b : ℤ) : ℕ × ℤ × ℤ := 
+  egcd_helper (Int.natAbs a) (Int.natAbs b)
+
+theorem egcd_divides (a b : ℕ) : 
+    (egcd_helper a b).1 ∣ a ∧ (egcd_helper a b).1 ∣ b := by
+  fun_induction egcd_helper a b with
+    | case1 b => 
+      simp only
+      show b ∣ 0 ∧ b ∣ b 
+      /- leverage fact that every number divides zero and 
+         every number divides itself.
+      -/
+      exact ⟨ Nat.dvd_zero b, Nat.dvd_refl b⟩ 
+    | case2 a b h₁ c x' y' h₂ h_ind =>
+      simp only
+      show c ∣ a ∧ c ∣ b 
+      have : (egcd_helper (b % a) a).1 = c := by grind only
+      have h₃ : c ∣ a := by grind only
+      have h₄ : c ∣ (b % a) := by grind only
+      have h₅ : c ∣ b := (Nat.dvd_mod_iff h₃).mp h₄
+      exact ⟨ h₃,h₅ ⟩ 
+
+theorem egcd_gcd  (a b d: ℕ) (h₁ : d ∣ a) (h₂ : d ∣  b) 
+  : d ∣ (egcd_helper a b).1 := sorry
+
+theorem egcd_equation  (a b d: ℕ) 
+  : a * (egcd_helper a b).2.1 + b * (egcd_helper a b).2.2 = 
+  (egcd_helper a b).1 := sorry
