@@ -79,9 +79,21 @@ theorem egcd_divides (a b : ℕ) :
       have h₅ : c ∣ b := (Nat.dvd_mod_iff h₃).mp h₄
       exact ⟨ h₃,h₅ ⟩ 
 
-theorem egcd_gcd  (a b d: ℕ) (h₁ : d ∣ a) (h₂ : d ∣  b) 
-  : d ∣ (egcd_helper a b).1 := sorry
-
+theorem egcd_gcd (a b d : ℕ) (h₁ : d ∣ a) (h₂ : d ∣ b)
+  : d ∣ (egcd a b).1 := by
+    unfold egcd
+    fun_induction egcd.egcd_helper a b with
+      | case1 b => 
+        simp only
+        show d ∣ b
+        assumption
+      | case2 a b h c x' y' h₃ h_ind =>
+        simp only
+        show d ∣ c
+        have h_ind' : d ∣ (b % a) → d ∣ a → d ∣ c := by grind only
+        have h₃ : d ∣ (b % a) := (Nat.dvd_mod_iff h₁).mpr h₂ 
+        exact h_ind' h₃ h₁
+        
 theorem egcd_equation  (a b d: ℕ) 
   : a * (egcd a b).2.1 + b * (egcd a b).2.2 = 
   (egcd a b).1 := sorry
