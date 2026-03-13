@@ -58,11 +58,10 @@ def egcd (a b : ℤ) : ℕ × ℤ × ℤ :=
     assumption
   }
 
-
-theorem egcd_divides (a b : ℕ) : 
-    (egcd a b).1 ∣ a ∧ (egcd a b).1 ∣ b := by
+theorem egcd_divides (a b : ℤ) : 
+    (egcd a b).1 ∣ a.natAbs ∧ (egcd a b).1 ∣ b.natAbs := by
   unfold egcd 
-  fun_induction egcd.egcd_helper a b with
+  fun_induction egcd.egcd_helper a.natAbs b.natAbs with
     | case1 b => 
       simp only
       show b ∣ 0 ∧ b ∣ b 
@@ -79,7 +78,7 @@ theorem egcd_divides (a b : ℕ) :
       have h₅ : c ∣ b := (Nat.dvd_mod_iff h₃).mp h₄
       exact ⟨ h₃,h₅ ⟩ 
 
-theorem egcd_gcd (a b d : ℕ) (h₁ : d ∣ a) (h₂ : d ∣ b)
+theorem egcd_gcd_nat (a b d : ℕ) (h₁ : d ∣ a) (h₂ : d ∣ b)
   : d ∣ (egcd a b).1 := by
     unfold egcd
     fun_induction egcd.egcd_helper a b with
@@ -94,6 +93,7 @@ theorem egcd_gcd (a b d : ℕ) (h₁ : d ∣ a) (h₂ : d ∣ b)
         have h₃ : d ∣ (b % a) := (Nat.dvd_mod_iff h₁).mpr h₂ 
         exact h_ind' h₃ h₁
         
-theorem egcd_equation  (a b d: ℕ) 
-  : a * (egcd a b).2.1 + b * (egcd a b).2.2 = 
-  (egcd a b).1 := sorry
+theorem egcd_equation  (a b d : ℤ)
+  : a * (egcd a.natAbs b.natAbs).2.1 
+  + b * (egcd a.natAbs b.natAbs).2.2 
+  = (egcd a.natAbs b.natAbs).1 := sorry
